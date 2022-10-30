@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>1) Authorize</h2>
+
+    <a href="{{ github_authorize_url }}">{{ github_authorize_url }}</a>
+
+
+    <h1>2) Auto configure repo</h2>
+    {% if session.get('access_token', None) is sameas None %}
+      You need to connect Github first (Step 1).
+    {% else %}
+      <h2>Congrats! Github is connected.</h2>
+      <p>Now enter the repo url you want to configure</p>
+      <p>e.g. https://github.com/my-username/my-repo-name</p>
+      <form id="form" action="/configure-repo" method="post">
+        Repo url: <input name="repo_url" id="repo_url" /> <br />
+        Organisation name or username: <input name="org_name" id="org_name" />
+        <br />
+        repo_name <input name="repo_name" id="repo_name" />
+        <input type="submit" value="improve" />
+      </form>
+
+      <script>
+      // Get repo_name & org_name automatically from repo url
+      repo_url.addEventListener('focusout', function(e) {
+        parts = repo_url.value.split("/")
+        let repo_name = parts[parts.length - 1]
+        let org_name = parts[parts.length - 2]
+        document.getElementById('repo_name').value = repo_name
+        document.getElementById('org_name').value = org_name
+      });
+      form.addEventListener("submit", function(e) {
+              let org_name = document.getElementById("org_name").value;
+              let repo_name = document.getElementById("repo_name").value;
+              data = {"org_name": org_name, "repo_name": repo_name}
+        fetch("/configure-repo", {
+                method:"POST",
+                redirect: 'follow',
+                headers: {
+                        "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+              })
+        .then(() => document.location = "/")
+        e.preventDefault()
+      });
+      </script>
+    {% endif %}
+
+
+    {% if session.get('repo_name_configure_completed', None) is sameas None %}
+    {% else %}
+        <h1>Done!</h1>
+        Your repo: "{{ session['repo_name_configure_completed'] }}" has been configured. <br />
+        <a href="https://github.com/{{session['org_name']}}/{{session['repo_name']}}">
+          https://github.com/{{session['org_name']}}/{{session['repo_name']}}
+        </a>
+    {% endif %}
+
+
+  </body>
+</html>
