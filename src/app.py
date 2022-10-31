@@ -25,7 +25,7 @@ QuartSchema(app)
 async def index():
     client_id = GITHUB_OAUTH_CLIENT_ID
     state = f"{secrets.token_urlsafe(30)}"
-    github_authorize_url = f"https://github.com/login/oauth/authorize?client_id={client_id}&state={state}&scope=repo%20user:email"  # noqa: E501
+    github_authorize_url = f"https://github.com/login/oauth/authorize?client_id={client_id}&state={state}&scope=repo%20user:email%20workflow"  # noqa: E501
 
     return await render_template(
         "index.html",
@@ -93,6 +93,28 @@ async def configure_repo():
             headers=headers,
             data=json.dumps(data),
         )
+
+    # Commit ISSUE_TEMPLATE
+    with open(
+        "./repo-template-files/.github/ISSUE_TEMPLATE/feature_request.md"
+    ) as fp:  # noqa: E501
+        issue_template = fp.read()
+        issue_template = issue_template.replace("GITHUB_OWNER", username)
+        issue_template = issue_template.replace("GITHUB_REPO_NAME", repo_name)
+        issue_template_b64 = b64encode(issue_template.encode("utf-8")).decode(
+            "utf-8"
+        )  # noqa: E501
+        data = {
+            "message": "create .issue_template",
+            "committer": {"name": username, "email": email},
+            "content": issue_template_b64,
+        }
+        req = requests.put(
+            f"https://api.github.com/repos/{org_name}/{repo_name}/contents/.github/ISSUE_TEMPLATE/feature_request.md",  # noqa: E501
+            headers=headers,
+            data=json.dumps(data),
+        )
+
     session["repo_name"] = repo_name
     session["org_name"] = org_name
     session["repo_name_configure_completed"] = repo_name
