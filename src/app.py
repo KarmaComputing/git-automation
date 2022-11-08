@@ -15,7 +15,7 @@ load_dotenv(verbose=True)
 GITHUB_OAUTH_CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID")
 GITHUB_OAUTH_CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET")
 GITHUB_OAUTH_REDIRECT_URI = os.getenv("GITHUB_OAUTH_REDIRECT_URI")
-REPO_TEMPLATE_DIR = os.getenv("REPO_TEMPLATE_DIR=/usr/src/app/")
+REPO_TEMPLATE_DIR = os.getenv("REPO_TEMPLATE_DIR")
 
 app = Quart(__name__)
 app.config.from_prefixed_env()
