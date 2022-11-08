@@ -1,7 +1,7 @@
 # Git repo automation (Github)
 
 - Do you keep changing the same settings on new repos?
-- It that getting tedious?
+- Is that getting tedious?
 - This automated the process!
 
 Automatically add to your repos:
