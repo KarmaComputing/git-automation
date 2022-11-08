@@ -15,6 +15,7 @@ load_dotenv(verbose=True)
 GITHUB_OAUTH_CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID")
 GITHUB_OAUTH_CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET")
 GITHUB_OAUTH_REDIRECT_URI = os.getenv("GITHUB_OAUTH_REDIRECT_URI")
+REPO_TEMPLATE_DIR = os.getenv("REPO_TEMPLATE_DIR=/usr/src/app/")
 
 app = Quart(__name__)
 app.config.from_prefixed_env()
@@ -78,7 +79,7 @@ async def configure_repo():
     email = req.json()[0].get("email", None)
 
     # Commit autorc repo content
-    with open("./repo-template-files/.autorc") as fp:
+    with open(f"{REPO_TEMPLATE_DIR}/.autorc") as fp:
         autorc = fp.read()
         autorc = autorc.replace("GITHUB_OWNER", username)
         autorc = autorc.replace("GITHUB_REPO_NAME", repo_name)
@@ -96,7 +97,7 @@ async def configure_repo():
 
     # Commit ISSUE_TEMPLATE
     with open(
-        "./repo-template-files/.github/ISSUE_TEMPLATE/feature_request.md"
+        f"{REPO_TEMPLATE_DIR}/.github/ISSUE_TEMPLATE/feature_request.md"  # noqa: E501
     ) as fp:  # noqa: E501
         issue_template = fp.read()
         issue_template = issue_template.replace("GITHUB_OWNER", username)
