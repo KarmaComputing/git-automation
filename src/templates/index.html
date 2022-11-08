@@ -6,6 +6,21 @@
     <a href="{{ github_authorize_url }}">{{ github_authorize_url }}</a>
 
 
+    <hr />
+<!-- "feature flag"
+    <div id="container" style="display: flex">
+      <div>
+        <h2>New Repo</h2>
+        <form id="make_new_repo">
+        <label for="new_repo_name">New repo name:</label>
+        <input type="new_repo_name" id="new_repo_name" required />
+        <input type="submit" value="Make new repo" />
+        </form>
+      </div>
+    </div><!-- end #container
+-->
+
+
     <h1>2) Auto configure repo</h2>
     {% if session.get('access_token', None) is sameas None %}
       You need to connect Github first (Step 1).
@@ -45,6 +60,13 @@
         .then(() => document.location = "/")
         e.preventDefault()
       });
+
+      // make_new_repo
+      make_new_repo.addEventListener("click", function(e) {
+        let new_repo_name = document.getElementById("new_repo_name").value
+        alert(new_repo_name)
+      });
+      // end make_new_repo
       </script>
     {% endif %}
 

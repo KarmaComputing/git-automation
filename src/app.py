@@ -57,6 +57,34 @@ async def githubcallback():
     access_token = resp.get("access_token")
     session["access_token"] = access_token
 
+    # Use access token to configure repo
+    access_token = session.get("access_token")
+    headers = {"Authorization": f"token {access_token}"}
+    headers["Accept"] = "application/vnd.github+json"
+    session["github_headers"] = headers
+    req = requests.get("https://api.github.com/user", headers=headers).json()
+
+    # Get GitHub username for commit message
+    username = req.get("login")
+    session["username"] = username
+    # Get email address so can do git commits with correct author information
+    req = requests.get("https://api.github.com/user/emails", headers=headers)
+    email = req.json()[0].get("email", None)
+    session["email"] = email
+
+    # Get user repos
+    req = requests.get(
+        f"https://api.github.com/users/{username}/repos",
+        headers=session.get("github_headers"),
+    )
+
+    # Get authenticated users organisation names
+    req = requests.get(
+        "https://api.github.com/user/orgs",
+        headers=session.get("github_headers"),  # noqa: E501
+    )
+    session["user_orgs"] = req.json()
+
     return redirect(url_for("index"))
 
 
@@ -66,22 +94,16 @@ async def configure_repo():
     org_name = data["org_name"]
     repo_name = data["repo_name"]
 
-    # Use access token to configure repo
-    access_token = session.get("access_token")
-    headers = {"Authorization": f"token {access_token}"}
-    headers["Accept"] = "application/vnd.github+json"
-    req = requests.get("https://api.github.com/user", headers=headers).json()
-
-    # Get GitHub username for commit message
-    username = req.get("login")
-    # Get email address so can do git commits with correct author information
-    req = requests.get("https://api.github.com/user/emails", headers=headers)
-    email = req.json()[0].get("email", None)
+    session["repo_name"] = repo_name
+    session["org_name"] = org_name
+    username = session.get("username")
+    email = session.get("email")
+    headers = session.get("github_headers")
 
     # Commit autorc repo content
     with open(f"{REPO_TEMPLATE_DIR}/.autorc") as fp:
         autorc = fp.read()
-        autorc = autorc.replace("GITHUB_OWNER", username)
+        autorc = autorc.replace("GITHUB_OWNER", org_name)
         autorc = autorc.replace("GITHUB_REPO_NAME", repo_name)
         autorc_b64 = b64encode(autorc.encode("utf-8")).decode("utf-8")
         data = {
@@ -94,6 +116,39 @@ async def configure_repo():
             headers=headers,
             data=json.dumps(data),
         )
+        print(req.text)
+    with open(f"{REPO_TEMPLATE_DIR}/.github/workflows/release.yml") as fp:
+        autorc_release = fp.read()
+        autorc_release_b64 = b64encode(autorc_release.encode("utf-8")).decode(
+            "utf-8"
+        )  # noqa: E501
+        data = {
+            "message": "create autorc release.yml workflow",
+            "committer": {"name": username, "email": email},
+            "content": autorc_release_b64,
+        }
+        req = requests.put(
+            f"https://api.github.com/repos/{org_name}/{repo_name}/contents/.github/workflows/release.yml",  # noqa: E501
+            headers=headers,
+            data=json.dumps(data),
+        )
+        print(req.text)
+
+    # Commit deploy.yml
+    with open(f"{REPO_TEMPLATE_DIR}/.github/workflows/deploy.yml") as fp:
+        deploy = fp.read()
+        deploy_b64 = b64encode(deploy.encode("utf-8")).decode("utf-8")  # noqa: E501
+        data = {
+            "message": "create deploy.yml workflow",
+            "committer": {"name": username, "email": email},
+            "content": deploy_b64,
+        }
+        req = requests.put(
+            f"https://api.github.com/repos/{org_name}/{repo_name}/contents/.github/workflows/deploy.yml",  # noqa: E501
+            headers=headers,
+            data=json.dumps(data),
+        )
+        print(req.text)
 
     # Commit ISSUE_TEMPLATE
     with open(
@@ -110,13 +165,13 @@ async def configure_repo():
             "committer": {"name": username, "email": email},
             "content": issue_template_b64,
         }
+
         req = requests.put(
             f"https://api.github.com/repos/{org_name}/{repo_name}/contents/.github/ISSUE_TEMPLATE/feature_request.md",  # noqa: E501
             headers=headers,
             data=json.dumps(data),
         )
+        print(req.text)
 
-    session["repo_name"] = repo_name
-    session["org_name"] = org_name
     session["repo_name_configure_completed"] = repo_name
     return redirect(url_for("index"))
