@@ -70,6 +70,7 @@ async def githubcallback():
     session["username"] = username
     # Get email address so can do git commits with correct author information
     req = requests.get("https://api.github.com/user/emails", headers=headers)
+    print(req.json())
     email = req.json()[0].get("email", None)
     session["email"] = email
 
