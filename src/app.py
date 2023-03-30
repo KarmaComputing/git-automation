@@ -105,6 +105,7 @@ async def configure_repo():
         autorc = fp.read()
         autorc = autorc.replace("GITHUB_OWNER", org_name)
         autorc = autorc.replace("GITHUB_REPO_NAME", repo_name)
+        autorc = autorc.replace("GITHUB_REPO_OWNER_EMAIL", email)
         autorc_b64 = b64encode(autorc.encode("utf-8")).decode("utf-8")
         data = {
             "message": "create .autorc",

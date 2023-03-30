@@ -4,8 +4,9 @@
     "all-contributors",
     "first-time-contributor",
     "released"
-  ],  
+  ],
   "owner": "GITHUB_OWNER",
   "repo": "GITHUB_REPO_NAME",
   "name": "GITHUB_OWNER",
+  "email": "GITHUB_REPO_OWNER_EMAIL"
 }
