@@ -31,6 +31,7 @@ async def index():
     return await render_template(
         "index.html",
         github_authorize_url=github_authorize_url,
+        repos=session.get("repos"),
     )
 
 
@@ -74,9 +75,32 @@ async def githubcallback():
 
     # Get user repos
     req = requests.get(
-        f"https://api.github.com/users/{username}/repos",
+        f"https://api.github.com/users/{username}/repos?type=all&per_page=100",
         headers=session.get("github_headers"),
     )
+
+    users_repos = req.json()
+
+    # Check if there are more pages of results
+    while "next" in req.links.keys():
+        # Retrieve the next page of results
+        req = requests.get(req.links["next"]["url"], headers=headers)
+        users_repos.extend(req.json())
+
+    repos = []
+    count = 0
+    try:
+        for user_repo in users_repos:
+            print(f"adding {user_repo}")
+            count += count
+            repo = user_repo["html_url"].replace("https://github.com/", "")
+            repos.append(repo)
+    except Exception as e:
+        print(e)
+        breakpoint()
+        print("here")
+
+    session["repos"] = repos
 
     # Get authenticated users organisation names
     req = requests.get(
