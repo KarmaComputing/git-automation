@@ -70,6 +70,7 @@
         document.getElementById('org_name').value = org_name
       });
       form.addEventListener("submit", function(e) {
+              console.log("form submitted");
               let org_name = document.getElementById("org_name").value;
               let repo_name = document.getElementById("repo_name").value;
               data = {"org_name": org_name, "repo_name": repo_name}
@@ -85,12 +86,12 @@
         e.preventDefault()
       });
 
-      // make_new_repo
+      /* make_new_repo
       make_new_repo.addEventListener("click", function(e) {
         let new_repo_name = document.getElementById("new_repo_name").value
         alert(new_repo_name)
       });
-      // end make_new_repo
+      // end make_new_repo */
       </script>
     {% endif %}
 
