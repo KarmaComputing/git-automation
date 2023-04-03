@@ -7,50 +7,49 @@
     <div class="container">
     <h1>1) Authorize</h2>
 
-    <a href="{{ github_authorize_url }}">{{ github_authorize_url }}</a>
-
-
+    <a href="{{ github_authorize_url }}" class="btn btn-success">Connect GitHub</a>
     <hr />
-<!-- "feature flag"
+    {% if session.get('access_token', None) is sameas None %}
+    <h2 class="alert alert-warning">You need to connect Github first</h2>
+    {% else %}
+      <h2 class="alert alert-success">Congrats, Github is connected!</h2>
+      <hr />
+
+    <h1>2) Auto configure repo</h2>
+
+    <!-- #container 
     <div id="container" style="display: flex">
       <div>
-        <h2>New Repo</h2>
+        <h2>Create new repo (or choose existing repo below)</h2>
         <form id="make_new_repo">
         <label for="new_repo_name">New repo name:</label>
         <input type="new_repo_name" id="new_repo_name" required />
         <input type="submit" value="Make new repo" />
         </form>
       </div>
-    </div><!-- end #container
--->
+    </div>
+    <!-- end #container -->
 
+    <h2>Choose existing repo</h2>
+    <form id="form" action="/configure-repo" method="post">
 
-    <h1>2) Auto configure repo</h2>
-    {% if session.get('access_token', None) is sameas None %}
-      You need to connect Github first (Step 1).
-    {% else %}
-      <h2>Congrats! Github is connected.</h2>
-      <p>Now enter the repo url you want to configure</p>
-      <p>e.g. https://github.com/my-username/my-repo-name</p>
-      <form id="form" action="/configure-repo" method="post">
+      <label for="repo-choice">Select your repo:</label><br />
+      <input list="user-repos" id="repo_choice" name="repo-choice" placeholder="Start typing...">
 
-        <label for="repo-choice">Select your repo:</label><br />
-        <input list="user-repos" id="repo_choice" name="repo-choice" placeholder="Start typing...">
+      <datalist id="user-repos">
+        {% for repo in repos %}
+          <option value="{{ repo }}">
+        {% endfor %}
+      </datalist>
+      <br />
+      <hr />
+      Or, manually enter repo url: <input name="repo_url" id="repo_url" /> <br />
+      Organisation name or username: <input name="org_name" id="org_name" /> <br />
+      repo_name <input name="repo_name" id="repo_name" />
+      <br /><br />
+      <input type="submit" value="automate my repo" />
 
-        <datalist id="user-repos">
-          {% for repo in repos %}
-            <option value="{{ repo }}">
-          {% endfor %}
-        </datalist>
-        <br />
-        <hr />
-        Or, manually enter repo url: <input name="repo_url" id="repo_url" /> <br />
-        Organisation name or username: <input name="org_name" id="org_name" /> <br />
-        repo_name <input name="repo_name" id="repo_name" />
-        <br /><br />
-        <input type="submit" value="automate my repo" />
-
-      </form>
+    </form>
 
       <script>
       repo_choice.addEventListener('focusout', function(e) {
