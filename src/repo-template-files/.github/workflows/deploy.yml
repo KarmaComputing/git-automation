@@ -1,12 +1,12 @@
 ---
-name: 'deploy'
+name: 'Deploy'
 
 # yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       - name: Push to dokku
-        uses: dokku/github-action@master
+        uses: dokku/github-action@main
         with:
           git_remote_url: 'ssh://${{ secrets.DOKKU_HOST }}/${{ github.event.repository.name }}'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
