@@ -98,8 +98,6 @@ async def githubcallback():
             repos.append(repo)
     except Exception as e:
         print(e)
-        breakpoint()
-        print("here")
 
     session["repos"] = repos
 
