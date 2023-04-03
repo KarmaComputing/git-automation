@@ -2,12 +2,38 @@
 <html>
     <head>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <style>
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60px;
+      line-height: 60px;
+      background-color: #f5f5f5;
+    }
+    </style>
     </head>
   <body>
-    <div class="container">
+    <main role="main" class="container mb-5">
+
+    <div class="p-5 mb-4 bg-light rounded-3">
+      <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Git repo automation with pipelines</h1>
+        <p class="col-md-8 fs-4">Use this to enhance &amp; automate your Git repo(s) with <b>automated releases</b>, <b>issue templates</b>, and <b>pipelines</b> using open source tooling.</p>
+        {% if session.get('access_token', None) is sameas None %}
+        <a href="{{ github_authorize_url }}" class="btn btn-primary btn-lg" type="button">Connect GitHub</a>
+        {% endif %}
+
+        <p>Improve project quality, and ship faster with good minimal standards for every repo- automated.</p>
+      </div>
+    </div>
+
     <h1>1) Authorize</h2>
 
+    {% if session.get('access_token', None) is sameas None %}
     <a href="{{ github_authorize_url }}" class="btn btn-success">Connect GitHub</a>
+    {% endif %}
+
     <hr />
     {% if session.get('access_token', None) is sameas None %}
     <h2 class="alert alert-warning">You need to connect Github first</h2>
@@ -47,7 +73,16 @@
       Organisation name or username: <input name="org_name" id="org_name" /> <br />
       repo_name <input name="repo_name" id="repo_name" />
       <br /><br />
-      <input type="submit" value="automate my repo" />
+      <p>
+      When you press 'automate my repo' the following will be added to your selected repo:
+      </p>
+      <ul>
+        <li>Issue templates</li>
+        <li>Automated release tagging (using <a href="https://intuit.github.io/auto/">Intuit Auto</a>)</li>
+        <li>Automated deployment (using <a href="https://dokku.com/">Dokku</a>)*</li>
+      </ul>
+      <p>*Note: For the automated deployment you need a <a href="https://dokku.com/docs/getting-started/installation/">dokku server configured.</a></p>
+      <input type="submit" class="btn btn-success" value="Automate my repo" />
 
     </form>
 
@@ -104,6 +139,8 @@
         </a>
     {% endif %}
 
-  </div>
+
+  </main>
+
   </body>
 </html>
