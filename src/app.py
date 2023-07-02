@@ -6,10 +6,6 @@ from base64 import b64encode
 import requests
 import json
 
-from quart_schema import (
-    QuartSchema,
-)
-
 load_dotenv(verbose=True)
 
 GITHUB_OAUTH_CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID")
@@ -19,7 +15,6 @@ REPO_TEMPLATE_DIR = os.getenv("REPO_TEMPLATE_DIR")
 
 app = Quart(__name__)
 app.config.from_prefixed_env()
-QuartSchema(app)
 
 
 @app.route("/")
